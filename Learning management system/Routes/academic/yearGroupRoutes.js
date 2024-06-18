@@ -1,17 +1,18 @@
 const express = require('express')
 const { createYearGroup, getYearGroup, getYearGroups, updateYearGroup, deleteYearGroup } = require('../../Controllers/academics/yearGroupCtrl')
-const { authenticateAdmin, authorizeAdmin } = require('../../middlewares/adminAuth')
+// const { authenticateAdmin, authorizeAdmin } = require('../../middlewares/adminAuth')
+const { authenticateUser, authorizeUser } = require('../../middlewares/isAuthenticated')
 const yearGroupRouter = express.Router()
 
 
 yearGroupRouter.route('/')
-.post(authenticateAdmin,authorizeAdmin,createYearGroup)
-.get(authenticateAdmin,authorizeAdmin,getYearGroups)
+.post(authenticateUser,authorizeUser('Admin'),createYearGroup)
+.get(authenticateUser,authorizeUser('Admin'),getYearGroups)
 
 
 yearGroupRouter.route('/:id')
-.get(authenticateAdmin,authorizeAdmin,getYearGroup)
-.patch(authenticateAdmin,authorizeAdmin,updateYearGroup)
-.delete(authenticateAdmin,authorizeAdmin, deleteYearGroup)
+.get(authenticateUser,authorizeUser('Admin'),getYearGroup)
+.patch(authenticateUser,authorizeUser('Admin'),updateYearGroup)
+.delete(authenticateUser,authorizeUser('Admin'), deleteYearGroup)
 
 module.exports = yearGroupRouter

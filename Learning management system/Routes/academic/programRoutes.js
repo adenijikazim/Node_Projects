@@ -1,17 +1,18 @@
 const express = require('express')
 const { createProgram, getPrograms, getProgram, updateProgram, deleteProgram } = require('../../Controllers/academics/programCtrl')
-const { authenticateAdmin, authorizeAdmin } = require('../../middlewares/adminAuth')
+// const { authenticateAdmin, authorizeAdmin } = require('../../middlewares/adminAuth')
+const { authenticateUser, authorizeUser } = require('../../middlewares/isAuthenticated')
 const programRouter = express.Router()
 
 programRouter.route('/')
-.post(authenticateAdmin,authorizeAdmin,createProgram)
-.get(authenticateAdmin,authorizeAdmin,getPrograms)
+.post(authenticateUser,authorizeUser('Admin'),createProgram)
+.get(authenticateUser,authorizeUser('Admin'),getPrograms)
 
 
 programRouter.route('/:id')
-.get(authenticateAdmin,authorizeAdmin,getProgram)
-.patch(authenticateAdmin,authorizeAdmin,updateProgram)
-.delete(authenticateAdmin,authorizeAdmin,deleteProgram)
+.get(authenticateUser,authorizeUser('Admin'),getProgram)
+.patch(authenticateUser,authorizeUser('Admin'),updateProgram)
+.delete(authenticateUser,authorizeUser('Admin'),deleteProgram)
 
 
 module.exports = programRouter

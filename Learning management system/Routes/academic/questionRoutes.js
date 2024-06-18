@@ -1,15 +1,16 @@
 const express = require('express')
 const { createQuestion, getQuestions, getQuestion, updateQuestion, deleteQuestion } = require('../../Controllers/academics/questionCtrl')
-const { authenticateTeacher, authorizeTeacher } = require('../../middlewares/teacherAuth')
+// const { authenticateTeacher, authorizeTeacher } = require('../../middlewares/teacherAuth')
+const { authenticateUser, authorizeUser } = require('../../middlewares/isAuthenticated')
 const questionRouter = express.Router()
 
 
-questionRouter.get('/',authenticateTeacher,authorizeTeacher, getQuestions)
+questionRouter.get('/',authenticateUser,authorizeUser('Teacher'), getQuestions)
 questionRouter.route('/:id') 
-.get(authenticateTeacher,authorizeTeacher, getQuestion)
-.patch(authenticateTeacher,authorizeTeacher, updateQuestion)
-.delete(authenticateTeacher,authorizeTeacher, deleteQuestion)
+.get(authenticateUser,authorizeUser('Teacher'), getQuestion)
+.patch(authenticateUser,authorizeUser('Teacher'), updateQuestion)
+.delete(authenticateUser,authorizeUser('Teacher'), deleteQuestion)
 , 
-questionRouter.post('/:examID',authenticateTeacher,authorizeTeacher, createQuestion)
+questionRouter.post('/:examID',authenticateUser,authorizeUser('Teacher'), createQuestion)
 
 module.exports = questionRouter

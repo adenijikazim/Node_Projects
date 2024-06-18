@@ -17,9 +17,9 @@ const AdminRegisterStudent = async(req,res)=>{
         throw new Error('Student already registered')
     }
     const studentCreated = await Student.create({name,email,password,createdBy:req.adminAuth._id})
-    const studentToken = jwt.sign({id:studentCreated._id}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
+    const studentToken = jwt.sign({id:studentCreated._id,role:studentCreated.role}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
     const oneDay = 1000*60*60*24*3
-    res.cookie('studentToken', studentToken,{
+    res.cookie('token', studentToken,{
         httponly:true,
         // secure:true,
         expires:new Date(Date.now() + oneDay)
@@ -45,9 +45,9 @@ const loginStudent = async(req,res)=>{
     if(!compare){
         throw new Error('Invalid login credentials')
     }
-    const studentToken = jwt.sign({id:student._id}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
+    const studentToken = jwt.sign({id:student._id,role:student.role}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
     const oneDay = 1000*60*60*24*3
-    res.cookie('studentToken', studentToken,{
+    res.cookie('token', studentToken,{
         httponly:true,
         // secure:true,
         expires:new Date(Date.now() + oneDay)

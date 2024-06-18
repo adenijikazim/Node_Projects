@@ -19,7 +19,7 @@ const register = async(req,res)=>{
         expires:new Date(Date.now() + oneDay)
     })
     admin.password = undefined
-    res.status(StatusCodes.CREATED).json({message:'admin has been regitered', data:admin})
+    res.status(StatusCodes.CREATED).json({message:'admin has been registered', data:admin})
 }
 
 // @desc Login admin

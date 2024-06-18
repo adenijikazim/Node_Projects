@@ -16,9 +16,9 @@ const registerTeacher = async(req,res)=>{
         throw new Error('teacher already registered')
     }
     const teacherCreated = await Teacher.create({name,email,password,createdBy:req.adminAuth._id})
-    const token = jwt.sign({id:teacherCreated._id}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
+    const token = jwt.sign({id:teacherCreated._id,role:teacherCreated.role}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
     const oneDay = 1000*60*60*24
-    res.cookie('teacherToken', token,{
+    res.cookie('token', token,{
         // secure:true,
         httpOnly:true,
         expires:new Date(Date.now()+oneDay)
@@ -50,9 +50,9 @@ const LoginTeacher=async(req,res)=>{
         throw new Error('Invalid login details')
     }
     teacher.password=undefined
-    const token = jwt.sign({id:teacher._id}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
+    const token = jwt.sign({id:teacher._id,role:teacher.role}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
     const oneDay = 1000*60*60*24
-    res.cookie('teacherToken', token, {
+    res.cookie('token', token, {
         httpOnly:true,
         expires:new Date(Date.now()+oneDay) 
     })
