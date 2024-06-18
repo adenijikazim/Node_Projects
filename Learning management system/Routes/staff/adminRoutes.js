@@ -6,13 +6,15 @@ const { register, login,
     adminUnpublishExamResult, 
     getAdminProfile} = require('../../Controllers/staff/adminController')
 const { authenticateAdmin, authorizeAdmin } = require('../../middlewares/adminAuth')
+const { authorizeUser, authenticateUser } = require('../../middlewares/isAuthenticated')
 const adminRouter = express.Router()
 
 adminRouter.post('/register',register)
 adminRouter.post('/login',login)
-adminRouter.get('/',authenticateAdmin,authorizeAdmin, getAllAdmins)
+// adminRouter.get('/',authenticateAdmin,authorizeAdmin, getAllAdmins)
+adminRouter.get('/',authenticateUser,authorizeUser('Admin'), getAllAdmins)
 
-adminRouter.get('/profile',authenticateAdmin,authorizeAdmin, getAdminProfile)
+adminRouter.get('/profile',authenticateAdmin, getAdminProfile)
 
 adminRouter.route('/:id')
 .patch(authenticateAdmin,authorizeAdmin,updateAdmin)

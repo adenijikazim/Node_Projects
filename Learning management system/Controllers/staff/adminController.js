@@ -12,9 +12,9 @@ const register = async(req,res)=>{
         throw new Error('admin already registered')
     }
     const admin = await Admin.create({name,email,password})
-    const token = jwt.sign({id:admin._id}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
+    const token = jwt.sign({id:admin._id,role:admin.role}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
     const oneDay = 1000*60*60*24
-    res.cookie('adminToken', token, {
+    res.cookie('token', token, {
         httpOnly:true,
         expires:new Date(Date.now() + oneDay)
     })
@@ -35,9 +35,9 @@ const login = async(req,res)=>{
         throw new Error('Incorrect email or password')
     }
    
-    const token = jwt.sign({id:admin._id}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
+    const token = jwt.sign({id:admin._id,role:admin.role}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
     const oneDay = 1000*60*60*24
-    res.cookie('adminToken', token, {
+    res.cookie('token', token, {
         httpOnly:true,
         expires:new Date(Date.now() + oneDay)
     })
