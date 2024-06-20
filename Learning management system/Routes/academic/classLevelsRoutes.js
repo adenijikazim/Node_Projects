@@ -6,11 +6,11 @@ const classLevelRouter = express.Router()
 
 classLevelRouter.route('/')
 .post(authenticateUser,authorizeUser('Admin'),createClassLevel)
-.get(authenticateUser,authorize('Admin'),getClassLevels)
+.get(authenticateUser,authorizeUser('Admin'),getClassLevels)
 
 classLevelRouter.route('/:id')
-.get(authenticateUser,authorize('Admin'),getClassLevel)
-.patch(authenticateUser,authorize('Admin'),updateClassLevel)
-.delete(authenticateUser,authorize('Admin'),deleteClassLevel)
+.get(authenticateUser,authorizeUser('Admin'),getClassLevel)
+.patch(authenticateUser,authorizeUser('Admin'),updateClassLevel)
+.delete(authenticateUser,authorizeUser('Admin'),deleteClassLevel)
 
 module.exports = classLevelRouter

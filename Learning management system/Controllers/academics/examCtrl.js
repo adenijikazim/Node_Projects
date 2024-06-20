@@ -15,7 +15,7 @@ const createExam = async(req,res)=>{
         examType,
         createdBy,
         academicYear} = req.body
-        const teacherFound = await Teacher.findById(req.teacherAuth._id).select('-password')
+        const teacherFound = await Teacher.findById(req.userAuth.id).select('-password')
         if(!teacherFound){
             throw new Error('No teacher found')
         }
@@ -50,7 +50,7 @@ const getExam = async(req,res)=>{
 
 const updateExam = async(req,res)=>{
     req.body.createdBy = req.teacherAuth._id
-    const exam = await Exam.findByIdAndUpdate(req.params.id, req.body,{createdBy:req.teacherAuth._id}, {runValidators:true, new:true})
+    const exam = await Exam.findByIdAndUpdate(req.params.id, req.body,{createdBy:req.userAuth.id}, {runValidators:true, new:true})
     if(!exam){
         throw new Error('No exam found')
     }

@@ -49,7 +49,7 @@ const login = async(req,res)=>{
 // @desc get admin profile
 
 const getAdminProfile = async(req,res)=>{
-    const admin = await Admin.findById(req.adminAuth._id)
+    const admin = await Admin.findById(req.userAuth.id)
     .select('-password')
     .populate('academicTerms')
     .populate('academicYears')
@@ -58,9 +58,8 @@ const getAdminProfile = async(req,res)=>{
     .populate('classLevels')
     // .populate('students')
         if(!admin){
-            const error = new error(`Admin not found`)
+            const error = new Error(`Admin not found`)
         }
-        admin.password = undefined
         res.status(StatusCodes.OK).json({admin})
 }
 
@@ -80,7 +79,7 @@ const getAllAdmins = async(req,res)=>{
 // UPDATE ADMIN
 const updateAdmin = async(req,res)=>{
     const {name,email} = req.body
-    const admin = await Admin.findByIdAndUpdate(req.adminAuth._id, {name,email},{runValidators:true, new:true})
+    const admin = await Admin.findByIdAndUpdate(req.userAuth.id, {name,email},{runValidators:true, new:true})
     admin.password=undefined
     res.status(StatusCodes.OK).json({
         message:'successfully updated',
@@ -90,7 +89,7 @@ const updateAdmin = async(req,res)=>{
 }
 
 const deleteAdmin = async(req,res)=>{
-    await Admin.findByIdAndDelete(req.params.id, {createdBy:req.adminAuth._id})
+    await Admin.findByIdAndDelete(req.params.id, {createdBy:req.userAuth.id})
     res.status(StatusCodes.OK).json({
         message:'admin deleted successfully'
     })

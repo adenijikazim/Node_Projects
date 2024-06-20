@@ -9,9 +9,9 @@ teacherRouter.post('/admin/register',authenticateUser,authorizeUser('Admin'),reg
 teacherRouter.post('/login', LoginTeacher )
 teacherRouter.get('/admin', authenticateUser,authorizeUser('Admin'),getAllTeachersAdmin)
 teacherRouter.get('/profile',authenticateUser,authorizeUser('Teacher'), getTeacherProfile)
-teacherRouter.get('/:teacherID/admin',authenticateUser,authorizeAdmin('Admin'),  getTeacherByAdmin)
+teacherRouter.get('/:teacherID/admin',authenticateUser,authorizeUser('Admin'),  getTeacherByAdmin)
 teacherRouter.patch('/update',authenticateUser,authorizeUser('Teacher'), teacherUpdateProfile)
-teacherRouter.patch('/:teacherID/admin',authenticateUser,authorizeAdmin('Admin'), adminUpdateTeacher)
-teacherRouter.delete('/:teacherID/admin',authenticateUser,authorizeAdmin('Admin'), adminDeleteTeacher)
+teacherRouter.patch('/:teacherID/admin',authenticateUser,authorizeUser('Admin'), adminUpdateTeacher)
+teacherRouter.delete('/:teacherID/admin',authenticateUser,authorizeUser('Admin'), adminDeleteTeacher)
 
 module.exports = teacherRouter

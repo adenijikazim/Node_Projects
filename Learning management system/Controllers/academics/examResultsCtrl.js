@@ -3,7 +3,7 @@ const ExamResult = require('../../Models/academic/examResult')
 const Student = require('../../Models/academic/student')
 
 const checkExamResults = async(req,res)=>{
-    const studentFound = await Student.findById(req.studentAuth._id)
+    const studentFound = await Student.findById(req.userAuth.id)
         if(!studentFound){
             throw new Error('no student found')
         }

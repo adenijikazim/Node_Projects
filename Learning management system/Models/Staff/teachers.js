@@ -48,7 +48,7 @@ const teachersSchema = new mongoose.Schema({
     },
     role:{
         type:String,
-        default:'teacher'
+        default:'Teacher'
     },
     subject:{
         type:mongoose.Schema.Types.ObjectId,

@@ -14,12 +14,16 @@ const authenticateUser = async(req,res,next)=>{
         console.log(decodedToken)
         let user;
         if(decodedToken.role === 'Admin'){
-        user = await Admin.findById(decodedToken.id)}
+        user = await Admin.findById(decodedToken.id).select('_id email role')}
         else if(decodedToken.role === 'Teacher'){
-            user = await Teacher.findById(decodedToken.id)}
+            user = await Teacher.findById(decodedToken.id).select('_id email role')}
             else if(decodedToken.role === 'Student'){
-                user = await Student.findById(decodedToken.id)}
-        req.userAuth = user
+                user = await Student.findById(decodedToken.id).select('_id email role')}
+        // req.userAuth = user
+        req.userAuth = {
+            id: decodedToken.id,
+            role: decodedToken.role
+          };
         console.log(req.userAuth)
         next()
     } catch (error) {
@@ -35,11 +39,5 @@ const authorizeUser = role=>{
         next()
     }
 }
-// const authorizeUser = async(req,res,next)=>{
-//         if(req.adminAuth.role !== 'Admin') {
-//             throw new Error(`you are not allowed to access this route`)
-//     }
-//     next()
-// }
 
 module.exports = {authenticateUser, authorizeUser}

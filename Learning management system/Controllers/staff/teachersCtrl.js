@@ -7,15 +7,16 @@ const Admin = require('../../Models/Staff/adminModel')
 const registerTeacher = async(req,res)=>{
     const {name,email,password}= req.body
     //  find admin
-    const adminFound = await Admin.findById(req.adminAuth._id)
+    const adminFound = await Admin.findById(req.userAuth.id)
     if(!adminFound){
         throw new Error('admin not found')
     }
     const teacherFound = await Teacher.findOne({email})
     if(teacherFound){
         throw new Error('teacher already registered')
+
     }
-    const teacherCreated = await Teacher.create({name,email,password,createdBy:req.adminAuth._id})
+    const teacherCreated = await Teacher.create({name,email,password,createdBy:req.userAuth.id})
     const token = jwt.sign({id:teacherCreated._id,role:teacherCreated.role}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
     const oneDay = 1000*60*60*24
     res.cookie('token', token,{
@@ -86,7 +87,7 @@ const getTeacherByAdmin = async(req,res)=>{
 }
 
 const getTeacherProfile = async(req,res)=>{
-    const teacher = await Teacher.findById(req.teacherAuth._id).select('-password')
+    const teacher = await Teacher.findById(req.userAuth.id).select('-password')
     if(!teacher){
         throw new Error('No teacher found')
     }
@@ -100,7 +101,7 @@ const getTeacherProfile = async(req,res)=>{
 const teacherUpdateProfile = async(req,res)=>{
     const {name,email} = req.body
     
-    const teacher = await Teacher.findByIdAndUpdate(req.teacherAuth._id, {name,email}, {runValidators:true,new:true})
+    const teacher = await Teacher.findByIdAndUpdate(req.userAuth.id, {name,email}, {runValidators:true,new:true})
     teacher.password = undefined
     res.status(StatusCodes.OK).json({
         message:'profile updated successfully',
@@ -112,7 +113,7 @@ const teacherUpdateProfile = async(req,res)=>{
 const adminUpdateTeacher=async(req,res)=>{
     const teacher = await Teacher.findByIdAndUpdate(req.params.teacherID,req.body,{runValidators:true,new:true}).select('-password')
     if(!teacher){
-        throw new Error(`No teacher found for the id ${req.params.id}`)
+        throw new Error(`No teacher found for the id ${req.params.teacherID}`)
     }
     res.status(StatusCodes.OK).json({
         teacher

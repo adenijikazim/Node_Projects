@@ -9,8 +9,8 @@ const createProgram = async(req,res)=>{
     if(programFound){
         throw new Error('program name already exists')
     }
-    const programCreated = await Program.create({name,description,createdBy:req.adminAuth._id})
-    const admin = await Admin.findById(req.adminAuth._id)
+    const programCreated = await Program.create({name,description,createdBy:req.userAuth.id})
+    const admin = await Admin.findById(req.userAuth._id)
     admin.programs.push(programCreated._id)
     admin.save()
     res.status(StatusCodes.OK).json({
@@ -31,7 +31,7 @@ const getPrograms = async(req,res)=>{
 const getProgram = async(req,res)=>{
     const program = await Program.findById(req.params.id)
     if(!program){
-        throw new Error(`No progrma found for ${req.params.id}`)
+        throw new Error(`No program found for ${req.params.id}`)
     }
     res.status(StatusCodes.OK).json({
         message:'program fetched successfully',
@@ -46,7 +46,7 @@ const updateProgram = async(req,res)=>{
     if(programFound){
         throw new Error('name already exists')
     }
-    const program = await Program.findByIdAndUpdate(req.params.id, {name,description,createdBy:req.adminAuth._id},
+    const program = await Program.findByIdAndUpdate(req.params.id, {name,description,createdBy:req.userAuth.id},
         {runValidators:true,new:true})
         if(!program){
             throw new Error(`No program found for ${req.params.id}`)

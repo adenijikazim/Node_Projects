@@ -10,7 +10,7 @@ const createAcademiTerm = async(req,res)=>{
         throw new Error(`Academic Term already exist`)
     }
     const academicTermCreated = await AcademicTerm.create({name,description,duration,createdBy:req.adminAuth._id})
-    const admin = await Admin.findById(req.adminAuth._id)
+    const admin = await Admin.findById(req.userAuth.id)
     admin.academicTerms.push(academicTermCreated._id)
     await admin.save()
     res.status(StatusCodes.CREATED).json({
@@ -44,7 +44,7 @@ const updateAcademicTerm = async(req,res)=>{
     }
 
     const academicTerm = await AcademicTerm.findByIdAndUpdate(req.params.id,
-        {name,description,duration,createdBy:req.adminAuth._id},
+        {name,description,duration,createdBy:req.userAuth.id},
          {new:true, runvalidators:true})
          if(!academicTerm){
             throw new Error(`No id found for ${req.params.id}`)

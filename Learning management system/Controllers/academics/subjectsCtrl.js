@@ -15,7 +15,7 @@ const createSubject = async(req,res)=>{
     throw new Error('Subject already exists')
     }
 
-    const subjectCreated = await Subject.create({name,description,academicTerm,createdBy:req.adminAuth._id})
+    const subjectCreated = await Subject.create({name,description,academicTerm,createdBy:req.userAuth.id})
 
     programFound.subjects.push(subjectCreated._id)
     await programFound.save()
@@ -55,7 +55,7 @@ const updateSubject = async(req,res)=>{
     if(subjectFound){
         throw new Error('Subject name already exists')
     }
-    const subject = await Subject.findByIdAndUpdate((req.params.id),{name,description,createdBy:req.adminAuth._id},{runValidators:true, new:true})
+    const subject = await Subject.findByIdAndUpdate((req.params.id),{name,description,createdBy:req.userAuth.id},{runValidators:true, new:true})
     res.status(StatusCodes.OK).json({
         message:"subject succesfully updated",
         data:subject

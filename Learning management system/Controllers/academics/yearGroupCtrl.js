@@ -8,8 +8,8 @@ const createYearGroup = async(req,res)=>{
    if(yearGroupFound){
     throw new Error('year Group name already exists')
    }
-   const yearGroup = await YearGroup.create({name,academicYear,createdBy:req.adminAuth._id})
-   const admin = await Admin.findById(req.adminAuth._id)
+   const yearGroup = await YearGroup.create({name,academicYear,createdBy:req.userAuth.id})
+   const admin = await Admin.findById(req.userAuth.id)
    admin.yearGroups.push(yearGroup._id)
    await admin.save()
    res.status(StatusCodes.OK).json({
@@ -44,7 +44,7 @@ const getYearGroup = async(req,res)=>{
 const updateYearGroup = async(req,res)=>{
     const {name,academicYear } = req.body
     const yearGroup = await YearGroup.findByIdAndUpdate(req.params.id, 
-        {name,academicYear, createdBy:req.adminAuth._id},
+        {name,academicYear, createdBy:req.userAuth.id},
         {runValidators:true, new:true})
         res.status(StatusCodes.OK).json({
             message:"year Group updated successfully",

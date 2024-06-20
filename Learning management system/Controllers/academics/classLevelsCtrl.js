@@ -9,8 +9,8 @@ const createClassLevel = async(req,res)=>{
     if(classLevelFound){
         throw new Error('class level already exists')
     }
-    const classLevelcreated = await ClassLevel.create({name,description,createdBy:req.adminAuth._id})
-    const admin = await Admin.findById(req.adminAuth._id)
+    const classLevelcreated = await ClassLevel.create({name,description,createdBy:req.userAuth.id})
+    const admin = await Admin.findById(req.userAuth.id)
     admin.classLevels.push(classLevelcreated._id)
     await admin.save()
     res.status(StatusCodes.CREATED).json({
@@ -43,7 +43,7 @@ const updateClassLevel = async(req,res)=>{
     if(classLevelFound){
         throw new Error('class name already exists')
     }
-    const classLevel = await ClassLevel.findByIdAndUpdate(req.params.id,{name,description,createdBy:req.adminAuth._id},{runValidators:true, new:true})
+    const classLevel = await ClassLevel.findByIdAndUpdate(req.params.id,{name,description,createdBy:req.userAuth.id},{runValidators:true, new:true})
     res.status(StatusCodes.OK).json({
         message:'class Level updated sucessfully',
         data:classLevel

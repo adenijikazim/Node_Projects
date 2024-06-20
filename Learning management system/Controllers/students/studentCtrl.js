@@ -8,7 +8,7 @@ const Exam = require('../../Models/academic/exam')
 const AdminRegisterStudent = async(req,res)=>{
     const {name,email,password} = req.body
 
-    const adminFound = await Admin.findById(req.adminAuth._id)
+    const adminFound = await Admin.findById(req.userAuth.id)
     if(!adminFound){
         throw new Error('Admin not found')
     }
@@ -16,7 +16,7 @@ const AdminRegisterStudent = async(req,res)=>{
     if(studentFound){
         throw new Error('Student already registered')
     }
-    const studentCreated = await Student.create({name,email,password,createdBy:req.adminAuth._id})
+    const studentCreated = await Student.create({name,email,password,createdBy:req.userAuth.id})
     const studentToken = jwt.sign({id:studentCreated._id,role:studentCreated.role}, process.env.JWT_SECRET, {expiresIn:process.env.JWT_EXPIRES})
     const oneDay = 1000*60*60*24*3
     res.cookie('token', studentToken,{
@@ -116,7 +116,7 @@ const getStudentByAdmin = async(req,res)=>{
 }*/
 
 const studentProfile =  async(req,res)=>{
-    const student = await Student.findById(req.studentAuth._id).select('-password')
+    const student = await Student.findById(req.userAuth.id).select('-password')
     if(!student){
         throw new Error('student not found')
     }
@@ -127,7 +127,7 @@ const studentProfile =  async(req,res)=>{
 
 const studentUpdateProfile = async(req,res)=>{
     const {email}= req.body
-    const student = await Student.findByIdAndUpdate(req.studentAuth._id,{email},{runValidators:true, new:true}).select('-password')
+    const student = await Student.findByIdAndUpdate(req.userAuth.id,{email},{runValidators:true, new:true}).select('-password')
     if(!student){
         throw new error('No student found')
     }
@@ -163,7 +163,7 @@ const adminUpdateStudent = async(req,res)=>{
 /////////////////// STUDENT WRITE EXAM/////////////////
 const writeExam = async(req,res)=>{
     // get students
-    const studentFound = await Student.findById(req.studentAuth._id)
+    const studentFound = await Student.findById(req.userAuth.id)
     if(!studentFound){
         throw new Error('No student found')
     }

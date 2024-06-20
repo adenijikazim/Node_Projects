@@ -66,7 +66,7 @@ const getQuestion = async(req,res)=>{
 
 const updateQuestion = async (req,res)=>{
     const question = await Question.findByIdAndUpdate(req.params.id,
-         req.body,{createdBy:req.teacherAuth._id},
+         req.body,{createdBy:req.userAuth.id},
          {runValidators:true, new:true})
     if(!question){
         throw new Error('no question found')

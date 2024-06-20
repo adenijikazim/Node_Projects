@@ -12,10 +12,10 @@ const createAcademicYear = async(req,res)=>{
         {name,
         fromYear,
         toYear,
-        createdBy:req.adminAuth.id})
+        createdBy:req.userAuth.id})
 
         // push academic years into admin
-        const admin = await Admin.findById(req.adminAuth._id)
+        const admin = await Admin.findById(req.userAuth._id)
         admin.academicYears.push(academicYearCreated._id)
         await admin.save()
     res.status(StatusCodes.CREATED).json({
