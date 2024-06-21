@@ -55,21 +55,21 @@ const examResultSchema = new mongoose.Schema({
     },
     academicTerm:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'AcademicTerm',
+        ref:'AcademicTerms',
         required:'true'
     },
     academicYear:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'AcademicYear',
+        ref:'AcademicYears',
         required:'true'
     },
     isPublished:{
         type:Boolean,
-        default:false
+        default:true
     }
 
 },{timestamps:true})
 
 
-const ExamResult = mongoose.model('ExamResults', examResultSchema)
+const ExamResult = mongoose.model('ExamResult', examResultSchema)
 module.exports = ExamResult

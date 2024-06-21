@@ -36,12 +36,12 @@ const AdminRegisterStudent = async(req,res)=>{
 }
 
 const loginStudent = async(req,res)=>{
-    const {email,password} = req.body
+    const {email, password} = req.body
     const student = await Student.findOne({email})
     if(!student){
         throw new Error('Invalid login credentials')
     }
-    const compare = await student.comparePassword(password)
+    const compare = student.comparePassword(password)
     if(!compare){
         throw new Error('Invalid login credentials')
     }
@@ -80,12 +80,12 @@ const getStudentByAdmin = async(req,res)=>{
 
 }
 
-/*const studentProfile = async(req,res)=>{
-    const student = await Student.findById(req.studentAuth._id)
+const studentProfile = async(req,res)=>{
+    const student = await Student.findById(req.userAuth.id).select('-password')
+    .populate('examResults')
     if(!student){
         throw new Error('student not found')
     }
-
     // get student profile
     const studentProfile = {
     name:student.name,
@@ -99,11 +99,12 @@ const getStudentByAdmin = async(req,res)=>{
     prefectName:student.prefectName
     }
 
-    // get student exa result
-    const studentResult = student.examResults;
+    // get student exam result
+    const studentResults = student.examResults;
+
 
     // current exam
-    const currentExamResult = studentResult[examResults.length-1]
+    const currentExamResult = studentResults[studentResults.length - 1]
 
     // check if exam published
     const isPublished = currentExamResult.isPublished
@@ -113,17 +114,9 @@ const getStudentByAdmin = async(req,res)=>{
         examresult:isPublished ? currentExamResult : []
     })
 
-}*/
-
-const studentProfile =  async(req,res)=>{
-    const student = await Student.findById(req.userAuth.id).select('-password')
-    if(!student){
-        throw new Error('student not found')
-    }
-    res.status(StatusCodes.OK).json({
-        data:student
-    })
 }
+
+
 
 const studentUpdateProfile = async(req,res)=>{
     const {email}= req.body
@@ -181,10 +174,10 @@ const writeExam = async(req,res)=>{
     
     // check id student has already taken exams
 
-    // const studentTakenExams = await ExamResult.findOne({student:studentFound._id})
-    // if(studentTakenExams){
-    //     throw new Error('You have already taken exams')
-    // }
+    const studentTakenExams = await ExamResult.findOne({student:studentFound._id})
+    if(studentTakenExams){
+        throw new Error('You have already taken exams')
+    }
 
     if(studentFound.isWithdrawn || studentFound.isSuspended){
         throw new Error('You are suspended/withdrawn, you cant take this exams')

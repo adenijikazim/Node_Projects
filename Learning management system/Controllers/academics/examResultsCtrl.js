@@ -1,9 +1,11 @@
 const {StatusCodes} = require('http-status-codes')
-const ExamResult = require('../../Models/academic/examResult')
 const Student = require('../../Models/academic/student')
+const ExamResult = require('../../Models/academic/examResult')
+
 
 const checkExamResults = async(req,res)=>{
     const studentFound = await Student.findById(req.userAuth.id)
+    console.log(studentFound.studentId)
         if(!studentFound){
             throw new Error('no student found')
         }
@@ -12,23 +14,23 @@ const checkExamResults = async(req,res)=>{
         _id:req.params.id,
        studentID: studentFound.studentId
     })
-    .populate({
-        ref:'exam', 
-        path:'questions'
-    })
+    // .populate({
+    //     path:'questions'
+    // })
     .populate('classLevel')
     .populate('academicTerm')
     .populate('academicYear')
+    console.log(examResult)
 
     if(examResult.isPublished === false){
         throw new Error('Result not available, please check later')
     }
     res.status(StatusCodes.OK).json({
         message:"exam Result",
-        data:examResult,
-        student:studentFound
+        data:{examResult,
+        student:studentFound}
     })
-
+    
 }
 
 const getAllExamResults = async(req,res)=>{

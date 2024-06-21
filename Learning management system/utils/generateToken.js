@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+
 const payload = {
   id,role
 }

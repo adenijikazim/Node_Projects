@@ -1,2 +1,4 @@
 .env
 node_modules/
+middlewares/adminAuth.js
+
