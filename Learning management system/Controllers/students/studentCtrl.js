@@ -41,7 +41,7 @@ const loginStudent = async(req,res)=>{
     if(!student){
         throw new Error('Invalid login credentials')
     }
-    const compare = student.comparePassword(password)
+    const compare =await student.comparePassword(password)
     if(!compare){
         throw new Error('Invalid login credentials')
     }
@@ -149,6 +149,30 @@ const adminUpdateStudent = async(req,res)=>{
     })
 
 }
+
+
+const updateStudentsPassword = async(req,res,next)=>{
+    const {oldPassword, newPassword} = req.body
+    if(!oldPassword || !newPassword){
+        const error = new Error('please enter old and new password')
+        return next(error)
+    }
+    const student = await Student.findById(req.userAuth.id)
+    if(!student){
+        const error = new Error(`No user with the id ${req.userAuth.id}`)
+        return next(error)
+    }
+    const isPasswordCorrect =await student.comparePassword(oldPassword)
+    if(!isPasswordCorrect){
+        const error = new Error(`Incorrect password`)
+        return next(error)
+    }
+
+    student.password = newPassword
+    await student.save()
+    res.status(StatusCodes.OK).json({message:'password changed successfully'})
+}
+
 
 
     
@@ -328,7 +352,9 @@ if(examFound.academicTerm.name === '3rd term' && grade ==='pass' && studentFound
 
 
 
-module.exports = {AdminRegisterStudent,loginStudent, getStudentsByAdmin,getStudentByAdmin,studentProfile,studentUpdateProfile,adminUpdateStudent,writeExam
+module.exports = {AdminRegisterStudent,
+    loginStudent, getStudentsByAdmin,
+    getStudentByAdmin,studentProfile,studentUpdateProfile,adminUpdateStudent,writeExam,updateStudentsPassword
 
 }
 

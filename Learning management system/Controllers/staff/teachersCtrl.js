@@ -46,7 +46,7 @@ const LoginTeacher=async(req,res)=>{
     if(!teacher){
         throw new Error('Invalid login details')
     }
-    const comparePassword = teacher.comparePassword(password)
+    const comparePassword =await teacher.comparePassword(password)
     if(!comparePassword){
         throw new Error('Invalid login details')
     }
@@ -66,7 +66,8 @@ const LoginTeacher=async(req,res)=>{
 }
 
 const getAllTeachersAdmin = async(req,res)=>{
-    const teachers = await Teacher.find().select('-password')
+    const teachers = await Teacher.find()
+    teachers.password = undefined
     res.status(StatusCodes.OK).json({
         message:'Teachers fetched successfully',
         data:teachers
@@ -120,6 +121,29 @@ const adminUpdateTeacher=async(req,res)=>{
     })
 }
 
+const updateTeacherPassword = async(req,res,next)=>{
+    const {oldPassword, newPassword} = req.body
+    if(!oldPassword || !newPassword){
+        const error = new Error('please enter old and new password')
+        return next(error)
+    }
+    const teacher = await Teacher.findById(req.userAuth.id)
+    if(!teacher){
+        const error = new Error(`No user with the id ${req.userAuth.id}`)
+        return next(error)
+    }
+    const isPasswordCorrect =await teacher.comparePassword(oldPassword)
+    if(!isPasswordCorrect){
+        const error = new Error(`Incorrect password`)
+        return next(error)
+    }
+
+    teacher.password = newPassword
+    await teacher.save()
+    res.status(StatusCodes.OK).json({message:'password changed successfully'})
+}
+
+
 const adminDeleteTeacher = async(req,res)=>{
     await Teacher.findByIdAndDelete(req.params.teacherID)
     res.status(StatusCodes.OK).json('teacher has been deleted')
@@ -129,5 +153,5 @@ const adminDeleteTeacher = async(req,res)=>{
 module.exports ={
     registerTeacher,getTeacherByAdmin,
     getAllTeachersAdmin,teacherUpdateProfile,LoginTeacher,
-    getTeacherProfile,adminDeleteTeacher,adminUpdateTeacher
+    getTeacherProfile,adminDeleteTeacher,adminUpdateTeacher,updateTeacherPassword
 }

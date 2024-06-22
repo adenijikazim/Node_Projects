@@ -30,7 +30,7 @@ const login = async(req,res)=>{
     if(!admin){
         throw new Error('Admin does not exist')
     }
-    const compare = admin.comparePassword(password)
+    const compare =await admin.comparePassword(password)
     if(!compare){
         throw new Error('Incorrect email or password')
     }
@@ -67,10 +67,18 @@ const getAdminProfile = async(req,res)=>{
 ////// GET ALL ADMINS /////
 
 const getAllAdmins = async(req,res)=>{
-    const admins = await Admin.find().select('-password')
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 5
+    const skip = (page - 1) * limit
+    const total = await Admin.countDocuments()
+    const admins = await Admin.find()
+    .skip(skip)
+    .limit(limit)
+    .select('-password')
     res.status(StatusCodes.OK).json({
+        total,
+        results:admins.length,
         message:'admin fetched successfully',
-        count:admins.length,
         data:admins
     })
 }
@@ -96,25 +104,29 @@ const deleteAdmin = async(req,res)=>{
 
 }
 
-const adminSuspendTeacher = async(req,res)=>{
 
+const updateAdminPassword = async(req,res,next)=>{
+    const {oldPassword, newPassword} = req.body
+    if(!oldPassword || !newPassword){
+        const error = new Error('please enter old and new password')
+        return next(error)
+    }
+    const admin = await Admin.findById(req.userAuth.id)
+    if(!admin){
+        const error = new Error(`No user with the id ${req.userAuth.id}`)
+        return next(error)
+    }
+    const isPasswordCorrect =await admin.comparePassword(oldPassword)
+    if(!isPasswordCorrect){
+        const error = new Error(`Incorrect password`)
+        return next(error)
+    }
+
+    admin.password = newPassword
+    await admin.save()
+    res.status(StatusCodes.OK).json({message:'password changed successfully'})
 }
-const adminUnSuspendTeacher = async(req,res)=>{
 
-}
-const adminWithdrawTeacher = async(req,res)=>{
-
-}
-const adminUnwithdrawTeacher = async(req,res)=>{
-
-}
-
-const adminpublishExamResult = async(req,res)=>{
-
-}
-const adminUnpublishExamResult = async(req,res)=>{
-
-}
 
 module.exports= {
     register,
@@ -123,10 +135,6 @@ module.exports= {
     getAdminProfile,
     updateAdmin,
     deleteAdmin,
-    adminSuspendTeacher,
-    adminUnSuspendTeacher,
-    adminWithdrawTeacher,
-    adminUnwithdrawTeacher,
-    adminpublishExamResult,
-    adminUnpublishExamResult
+    updateAdminPassword
+   
 }
