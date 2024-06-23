@@ -14,7 +14,9 @@ const isAuthenticated =model=>{
             req.userAuth = user
             console.log(req.userAuth)
             next()
-        } catch (error) {
+        } 
+        
+        catch (error) {
             throw new Error('Login expired, please login')
         }
     }
