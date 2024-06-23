@@ -3,8 +3,10 @@ const customError = require('../utils/customError')
 const Movie = require('../Model/movieModel')
 const Review = require('../Model/reviewModel')
 
+
+///////CREATE A MOVIE/////////////
 const createMovie = async(req,res)=>{
-    // req.body.user = req.user.userId
+    req.body.user = req.user.userId
     const {name,description,ratings,duration} = req.body
     if(!name || !description || !ratings || !duration){
         res.json('[please enter all details')
@@ -14,6 +16,9 @@ const createMovie = async(req,res)=>{
 
 }
 
+
+
+///////GET ALL MOVIES/////////////
 const getAllMovies = async(req,res)=>{
     // const movie = await Movie.find()
     const movie = await Movie.find()
@@ -27,7 +32,7 @@ const getMovieStats = async(req,res)=>{
             $match:{ratings:{$gte:3}}
         },
         {$group:{
-            _id:null, // group by null
+            // _id:null, // group by null
             _id:'$releaseYear', // group by release year
             avgRating:{$avg:"$ratings"},
             avgPrice:{$avg:"$price"},
@@ -38,9 +43,13 @@ const getMovieStats = async(req,res)=>{
         }},
         {$sort:{minPrice:1}}
     ])
-    res.status(statusCodes.OK).json({movies})
+    
+    res.status(StatusCodes.OK).json({movies})
 }
 
+
+
+///////GET A MOVIE/////////////
 const getMovie = async(req,res)=>{
     const movie = await Movie.findOne({_id:req.params.id})
     if(!movie){
@@ -50,6 +59,9 @@ const getMovie = async(req,res)=>{
     res.status(StatusCodes.OK).json({movie})
 
 }
+
+
+///////DELETE A MOVIE/////////////
 const deleteMovie = async(req,res)=>{
     const movie = await Movie.findByIdAndDelete({_id:req.params.id})
     if(!movie){
@@ -59,6 +71,8 @@ const deleteMovie = async(req,res)=>{
 
 }
 
+
+///////UPDATE A MOVIE/////////////
 const updateMovie = async(req,res)=>{
     const {name,description,ratings,duration} = req.body
     const movie = await Movie.findByIdAndUpdate({_id:req.params.id}, {runValidators:true,new:true},req.body)
@@ -85,4 +99,4 @@ const updateMovie = async(req,res)=>{
 
 
 
-module.exports = {createMovie,getAllMovies,getMovie,deleteMovie,updateMovie,getMovieStats}
+module.exports = {createMovie,getAllMovies,getMovie,deleteMovie,updateMovie}

@@ -3,6 +3,8 @@ const customError = require("../utils/customError")
 const Review = require("../Model/reviewModel")
 const Movie = require("../Model/movieModel")
 
+
+/////////////////CREATE A REVIEW///////////
 const createReview = async(req,res)=>{
     console.log(req.user)
     const {movie :movieId} = req.body
@@ -18,6 +20,8 @@ const createReview = async(req,res)=>{
 
 }
 
+
+/////////////////GET ALL REVIEWS///////////
 const getAllReviews = async(req,res)=>{
     console.log(req.user)
 
@@ -34,6 +38,9 @@ res.status(StatusCodes.OK).json({
 
 }
 
+
+
+/////////////////GET A REVIEW///////////
 const getReview = async(req,res)=>{
 const review = await Review.findOne({_id:req.params.id}).populate({
     ref:"movie"
@@ -47,6 +54,8 @@ res.status(StatusCodes.OK).json({review})
 
 }
 
+
+/////////////////UPDATE A REVIEW///////////
 const updateReview = async (req,res)=>{
 const {comment,rating,title}=req.body
 const review = await Review.findOne({_id:req.params.id})
@@ -62,12 +71,14 @@ res.status(StatusCodes.OK).json({review})
 
 }
 
+
+/////////////////DELETES A REVIEW///////////
 const deleteReview = async(req,res)=>{
     const review = await Review.findByIdAndDelete({_id:req.params.id})
     if(!review){
         const error =new customError(`No review found for this id ${req.params.id}`, 400)
     } 
-    res.status(StatusCode.OK).json({'message':'review has been succesfully deleted'})
+    res.status(StatusCodes.OK).json({'message':'review has been succesfully deleted'})
 }
 
 const getSingleMovieReview = async(req,res)=>{

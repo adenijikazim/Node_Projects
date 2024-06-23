@@ -51,9 +51,6 @@ const login = async(req,res,next)=>{
         const error = new customError('Incorrect email or password', 401)
         return next(error)
     }
-    // const userData={name:user.name,user:user.email, role:user.role}
-    // const token = jwt.sign({id:user._id,role:user.role}, process.env.JWT_SECRET,
-    //     {expiresIn:process.env.JWT_EXPIRE})
         const token = signToken(user._id)
         const fourDays = 60*60*24*4*1000
         res.cookie('token',token, {
@@ -64,6 +61,8 @@ const login = async(req,res,next)=>{
     res.status(StatusCodes.OK).json({user:`${user.email} has logged in`})
 }
 
+
+///////// LOGOUT USER////////
 const logout = async (req,res)=>{
     res.cookie('token', 'logout',{
         httpOnly:true,
