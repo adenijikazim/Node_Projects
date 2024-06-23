@@ -5,6 +5,8 @@ const {StatusCodes}= require('http-status-codes')
 const CustomError = require('../utils/customError')
 const Review = require('../models/reviewModel')
 
+
+///////////////////////// CREATE A PRODUCT //////////////////
 const createProduct =async (req,res,next)=>{
     const {name} = req.body
     req.body.user = req.user.id
@@ -18,8 +20,7 @@ const createProduct =async (req,res,next)=>{
 }
 
 // desc - get all products
-// routes api/v1/products
-// private authuser
+///////////////////////// GET ALL PRODUCTS //////////////////
 const getAllProducts = async(req,res)=>{
     // convert queryStrings to number 
     const page = Number(req.query.page) || 1;
@@ -39,9 +40,9 @@ res.status(StatusCodes.OK).json({
     products})
 }
 
-// @desc get a single product
-// @route api/v1/product/:id
-// @privacy authUser
+
+
+///////////////////////// GET A SINGLE PRODUCT //////////////////
 const getSingleProduct = async(req,res)=>{
 const product = await Product.find({_id:req.params.id})
 if(!product){
@@ -52,6 +53,8 @@ res.status(StatusCodes.OK).json({product})
 
 }
 
+
+///////////////////////// UPDATE  A PRODUCT //////////////////
 const updateProduct = async(req,res)=>{
     const product = await Product.findByIdAndUpdate({_id:req.params.id},
         req.body,
@@ -64,6 +67,7 @@ const updateProduct = async(req,res)=>{
 }
 
 
+///////////////////////// DELETE A PRODUCT //////////////////
 const deleteProduct = async(req,res,next)=>{
     const product = await Product.findByIdAndDelete({_id:req.params.id})
     if(!product){
@@ -77,7 +81,7 @@ const deleteProduct = async(req,res,next)=>{
 
 
 
-
+/////////UPLOAD AN IMAGE////////////
 const uploadImage=async(req,res)=>{
     if(!req.files){
         const error = new CustomError(`No product with the id: ${req.params.id}`)

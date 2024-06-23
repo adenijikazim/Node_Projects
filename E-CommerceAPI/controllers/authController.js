@@ -6,7 +6,7 @@ const customError = require('../utils/customError')
 const signToken = require('../utils/generateToken')
 
 
-// REGISTER USER
+//@desc REGISTER USER
 const register = async(req,res,next)=>{
     const {name,email,password,confirmPassword,role} = req.body
     if(!name || !email || !password || !confirmPassword){
@@ -61,6 +61,8 @@ const login = async(req,res,next)=>{
     res.status(StatusCodes.OK).json(`${user.email} is logged in`)
 }
 
+
+///////////// logout user ///////////////
 const logout = async (req,res)=>{
     res.cookie('token', 'logout',{
         httpOnly:true,

@@ -4,6 +4,7 @@ const Product = require('../models/productModel');
 const CustomError = require('../utils/customError');
 
 
+///////////////////////// CREATE A REVIEW //////////////////
 const createReview = async(req,res,next)=>{
   req.body.user = req.user.id
   const { product: productId } = req.body;
@@ -33,6 +34,8 @@ const createReview = async(req,res,next)=>{
 
 }
 
+
+///////////////////////// GET ALL REVIEWS //////////////////
 const getAllReviews= async(req,res)=>{
     const reviews = await Review.find({}).populate({
         path:'product',
@@ -47,6 +50,9 @@ const getAllReviews= async(req,res)=>{
 
 }
 
+
+
+///////////////////////// GET A REVIEW //////////////////
 const getReview=async(req,res,next)=>{
     const review = await Review.findOne({_id:req.params.id})
     if(!review){
@@ -57,6 +63,8 @@ const getReview=async(req,res,next)=>{
 
 }
 
+
+///////////////////////// UPDATE A REVIEW //////////////////
 const updateReview=async(req,res,next)=>{
     const review = await Review.findOne({_id:req.params.id})
     const {comment,rating,title}=req.body
@@ -74,6 +82,7 @@ const updateReview=async(req,res,next)=>{
 }
 
 
+///////////////////////// DELETE A REVIEW //////////////////
 const deleteReview=async(req,res,next)=>{
     const review = await Review.findByIdAndDelete({_id:req.params.id})
     if(!review){

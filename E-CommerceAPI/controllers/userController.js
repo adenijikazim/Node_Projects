@@ -1,6 +1,7 @@
 const {StatusCodes} = require('http-status-codes')
 const User = require('../models/userModel')
 
+/////////// GET ALL USERS ////////////
 const getAllUsers = async(req,res)=>{
     const users = await User.find({role:'user'}).select('-password')
     res.status(StatusCodes.OK).json({
@@ -11,6 +12,7 @@ const getAllUsers = async(req,res)=>{
     })
 }
 
+/////// GET A USER BY ID///////
 const getUser = async(req,res,next)=>{
     const user = await User.findById(req.params.id).select('-password')
     if(!user)
@@ -21,24 +23,24 @@ const getUser = async(req,res,next)=>{
     res.status(StatusCodes.OK).json(user)
 
 }
+
+/////////////////////// GET USER PROFILE /////////////
 const getUserProfile = async(req,res)=>{
     console.log(req.user)
     res.status(StatusCodes.OK).json({user:req.user})
 }
 
 
-
+/////////// UPDATE USER//////////
 const updateUser = async(req,res,next)=>{
     const {name,email} = req.body
     const updatedUser = await User.findByIdAndUpdate(req.user._id, {name,email}, {runValidators:true, new:true})
-    // if(!updatedUser){
-    //     const error = new Error(`No user with the id ${req.params.userId}`)
-    //     return next(error)
-    // }
+
     updatedUser.password = undefined
     res.status(StatusCodes.OK).json(updatedUser)
 }
 
+////////////// UPDATE USER PASSWORD//////////////
 const updateUserPassword = async(req,res)=>{
     const {password,confirmPassword} = req.body
     const user = await User.findById(req.user.id).select('+password')
@@ -57,6 +59,8 @@ const updateUserPassword = async(req,res)=>{
     res.status(StatusCodes.OK).json({message:'password changed successfully'})
 }
 
+
+//////////// DELETE A USER///////////////
 const deleteUser = async(req,res)=>{
     await User.findByIdAndDelete(req.params.userId)
     res.status(StatusCodes.OK).json({message:'user deleted successfully'})
