@@ -41,7 +41,7 @@ const updateUser = async(req,res,next)=>{
 }
 
 const updateUserPassword = async(req,res)=>{
-    const {password,confirmPassword} = req.body
+    const {oldPassword,newPassword} = req.body
     const user = await User.findById(req.user.id).select('+password')
     if(!user){
         const error = new Error(`No user with the id ${req.user.id}`)

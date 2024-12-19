@@ -3,6 +3,7 @@ const User = require('../models/userModel')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const customError = require('../utils/customError')
+const Token = require('../models/token')
 
 
 // REGISTER USER
@@ -20,11 +21,9 @@ const register = async(req,res,next)=>{
     }
     const user = await User.create({name,email,password,confirmPassword,role})
     const userData = {name:user.name, email:user.email, role:user.role}
-    const token = jwt.sign(userData,
-         process.env.JWT_SECRET,
-        {expiresIn:process.env.JWT_EXPIRE})
+    const token = jwt.sign(userData, process.env.JWT_SECRET)
         const fourDays = 1000*60*60*24*4
-        res.cookie('token', token,{
+        res.cookie('accessToken', token,{
             httpOnly:true,
             // secure:true,
             expires:new Date(Date.now()+fourDays),
@@ -50,19 +49,55 @@ const login = async(req,res,next)=>{
         return next(error)
     }
 
-    const compare = user.comparePassword(password)
+    const compare =await user.comparePassword(password)
     if(!compare){
         const error = new customError('Incorrect email or password', 401)
         return next(error)
     }
     const userData={name:user.name,user:user.email, role:user.role}
-    const token = jwt.sign(userData, process.env.JWT_SECRET,
-        {expiresIn:process.env.JWT_EXPIRE})
+    const accessTokenJWT = jwt.sign(userData, process.env.JWT_SECRET)
+
+        // create refresh token 
+        let refreshToken = ''
+
+        // check for existing token 
+
+        const existingToken = await Token.findOne({user:user._id})
+        if(existingToken){
+            const {isValid} = existingToken
+            if(!isValid){
+                const error = new customError('Invalid login credentials', 401)
+                return next(error)
+            }
+            refreshToken = existingToken.refreshToken
+            const fourDays = 60*60*24*4*1000
+            res.cookie('refreshToken',refreshToken, {
+                httpOnly:true,
+                expires:new Date(Date.now()+fourDays)
+            })
+            res.status(StatusCodes.OK).json({user:userData})
+            return
+
+        }
+            
+           
+        refreshToken = crypto.randomBytes(40).toString('hex')
+        const userAgent = req.headers['user-agent']
+        const ip = req.ip
+
+        const userToken = {refreshToken,userAgent,ip,user:user._id}
+         await Token.create(userToken)
 
         const fourDays = 60*60*24*4*1000
-        res.cookie('token',token, {
+        res.cookie('accessToken',accessTokenJWT, {
             httpOnly:true,
             // secure:true,
+            // expires:new Date(Date.now()+fourDays)
+            maxAge:1000
+        })
+        
+        res.cookie('refreshToken',refreshToken, {
+            httpOnly:true,
             expires:new Date(Date.now()+fourDays)
         })
     res.status(StatusCodes.OK).json({user:userData})
