@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const customError = require('../utils/customError')
 const Token = require('../models/token')
+const { getToken } = require('../utils/getCookie')
 
 
 // REGISTER USER
@@ -20,19 +21,19 @@ const register = async(req,res,next)=>{
         return next(error)
     }
     const user = await User.create({name,email,password,confirmPassword,role})
-    const userData = {name:user.name, email:user.email, role:user.role}
-    const token = jwt.sign(userData, process.env.JWT_SECRET)
-        const fourDays = 1000*60*60*24*4
-        res.cookie('accessToken', token,{
+    const accessTokenJWT = getToken({id:user._id})
+        const fourDays = 60*60*24*7
+        res.cookie('accessToken', accessTokenJWT,{
             httpOnly:true,
             // secure:true,
-            expires:new Date(Date.now()+fourDays),
+            // expires:new Date(Date.now()+oneDay),
+            maxAge:24*60*60*1000 //1day
         })
 
     res.status(StatusCodes.CREATED).json({
         status:"success",
         data:{
-            userData
+            user
         }
     })
 
@@ -42,6 +43,7 @@ const register = async(req,res,next)=>{
 
 // LOGIN USER
 const login = async(req,res,next)=>{
+    const fourDays = 60*60*24*4*1000
     const {email,password}=req.body
     const user = await User.findOne({email})
     if(!user){
@@ -54,8 +56,8 @@ const login = async(req,res,next)=>{
         const error = new customError('Incorrect email or password', 401)
         return next(error)
     }
-    const userData={name:user.name,user:user.email, role:user.role}
-    const accessTokenJWT = jwt.sign(userData, process.env.JWT_SECRET)
+    // const userData={name:user.name,user:user.email, role:user.role}
+    const accessTokenJWT = getToken({id:user._id})
 
         // create refresh token 
         let refreshToken = ''
@@ -70,12 +72,11 @@ const login = async(req,res,next)=>{
                 return next(error)
             }
             refreshToken = existingToken.refreshToken
-            const fourDays = 60*60*24*4*1000
             res.cookie('refreshToken',refreshToken, {
                 httpOnly:true,
-                expires:new Date(Date.now()+fourDays)
+                maxAge:fourDays
             })
-            res.status(StatusCodes.OK).json({user:userData})
+            res.status(StatusCodes.OK).json({user})
             return
 
         }
@@ -88,23 +89,25 @@ const login = async(req,res,next)=>{
         const userToken = {refreshToken,userAgent,ip,user:user._id}
          await Token.create(userToken)
 
-        const fourDays = 60*60*24*4*1000
         res.cookie('accessToken',accessTokenJWT, {
             httpOnly:true,
             // secure:true,
             // expires:new Date(Date.now()+fourDays)
             maxAge:1000
+            // maxAge:1000*24*60*60
         })
         
         res.cookie('refreshToken',refreshToken, {
             httpOnly:true,
-            expires:new Date(Date.now()+fourDays)
+           maxAge:4*24*60*60*1000
         })
-    res.status(StatusCodes.OK).json({user:userData})
+    res.status(StatusCodes.OK).json({user:user})
 }
 
+
+
 const logout = async (req,res)=>{
-    res.cookie('token', 'logout',{
+    res.cookie('accessToken', 'logout',{
         httpOnly:true,
         expires:new Date(Date.now()+5*1000),
     })

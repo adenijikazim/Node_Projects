@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "isw-api",
+      "source": "@isw-api/v1.0#75uua9oclo4iq7ue",
+      "integrity": "sha512-eVPNDe8mLM7qiltG+WvkjikySV7AUeT58/B3oytisH4Fvz0D0zd3iYbR+vKtGRAOvr3L5JGFLekGCFaLwWN6gQ==",
+      "installerVersion": "6.1.2"
+    }
+  ]
+}

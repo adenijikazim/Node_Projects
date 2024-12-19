@@ -42,12 +42,16 @@ const updateUser = async(req,res,next)=>{
 
 const updateUserPassword = async(req,res)=>{
     const {oldPassword,newPassword} = req.body
+    if(!oldPassword || !newPassword){
+        const error = new Error('please enter old and new password')
+        return next(error)
+    }
     const user = await User.findById(req.user.id).select('+password')
     if(!user){
         const error = new Error(`No user with the id ${req.user.id}`)
         return next(error)
     }
-    const compare = user.comparePassword(password)
+    const compare = user.comparePassword(oldPassword)
     if(!compare){
         const error = new Error(`Incorrect password`)
         return next(error)

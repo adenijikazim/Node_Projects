@@ -2,7 +2,6 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 require("async-error-handler")
-const mongoose  = require('mongoose')
 const connectDB = require('./server')
 const cookieParser = require('cookie-parser');
 
